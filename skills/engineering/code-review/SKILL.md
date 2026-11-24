@@ -1,14 +1,15 @@
 ---
 name: code-review
-description: "Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes: Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\"."
+description: "Review the changes since a fixed point (commit, branch, tag, or merge-base) along three axes: Standards (does the code follow this repo's documented coding standards?), Spec (does the code match what the originating issue/spec asked for?), and Security (does it let an untrusted actor reach data or authority it shouldn't?). Runs the three reviews in parallel sub-agents and reports them side by side, with evidence-tiered security findings and a go/no-go. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\"."
 ---
 
-Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
+Three-axis review of the diff between `HEAD` and a fixed point the user supplies:
 
 - **Standards**: does the code conform to this repo's documented coding standards?
 - **Spec**: does the code faithfully implement the originating issue / spec?
+- **Security**: does the change let an untrusted actor reach data or authority it shouldn't?
 
-Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings. Start every sub-agent with a fresh context window.
+All three axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings. Start every sub-agent with a fresh context window.
 
 The issue tracker should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
 
@@ -16,7 +17,7 @@ The issue tracker should have been provided to you. If not, tell the user to run
 
 ### 1. Pin the fixed point
 
-Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main`, `HEAD~5`, etc.). If they didn't specify one, ask for it.
+Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main`, `HEAD~5`, etc.). If they didn't specify one: for an `@implement <issue>` session, default to the commit before the work (the issue's named merge-base); otherwise ask for it.
 
 Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base). Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
 
@@ -55,9 +56,9 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 - **Middle Man**: a class or function that mostly just delegates onward. → cut it, call the real target direct.
 - **Refused Bequest**: a subclass or implementer that ignores or overrides most of what it inherits. → drop the inheritance, use composition.
 
-### 4. Spawn both sub-agents in parallel
+### 4. Spawn all three sub-agents in parallel
 
-Issue both sub-agent calls together, in the foreground, and aggregate the reports they return.
+Issue all three sub-agent calls together, in the foreground, and aggregate the reports they return.
 
 **Standards sub-agent prompt** should include:
 
@@ -71,19 +72,30 @@ Issue both sub-agent calls together, in the foreground, and aggregate the report
 - The path or fetched contents of the spec.
 - The brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong. Quote the spec line for each finding. Under 400 words."
 
+**Security sub-agent prompt** should include:
+
+- The diff command and commit list.
+- The absolute path of `SECURITY.md` (next to this file), with the instruction to read it in full before starting. It carries the lens, the evidence tiers, the failed-controls register and the source list.
+- The brief: "Trace each untrusted input in the diff to its sink; quote `file:line` for every hop. Report findings under the severities in `SECURITY.md`, each with its evidence tier (Confirmed / Supported / Unverified) and its support. Fetch any source you cite in this session, or downgrade the finding to Unverified. State the trust-boundary assumptions you inferred, and the out-of-scope line. Under 400 words."
+
 If the spec is missing, skip the Spec sub-agent and note this in the final report.
 
 ### 5. Aggregate
 
-Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings, because the two axes are deliberately separate (see _Why two axes_).
+Present the three reports under `## Standards`, `## Spec` and `## Security` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings, because the axes are deliberately separate (see _Why three axes_).
 
-End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes: that's the reranking the separation exists to prevent.
+The one documented exception is security severity: keep the `## Security` findings in Critical → Low order, and end that section with a single go/no-go line: **do not merge** if any finding is Confirmed at Critical or High. Everything else stays unreanked.
 
-## Why two axes
+End with a one-line summary: total findings per axis, the worst issue _within each axis_ (if any), and the security go/no-go. Don't pick a single winner across the other axes: that's the reranking the separation exists to prevent.
 
-A change can pass one axis and fail the other:
+## Why three axes
+
+A change can pass two axes and fail the third:
 
 - Code that follows every standard but implements the wrong thing → **Standards pass, Spec fail.**
 - Code that does exactly what the issue asked but breaks the project's conventions → **Spec pass, Standards fail.**
+- Code that is clean, on-spec and still lets one user read another's records → **Standards pass, Spec pass, Security fail.**
 
-Reporting them separately stops one axis from masking the other.
+Reporting them separately stops one axis from masking the others.
+
+Security is also the one axis that can block on its own, which is why it carries severities and the go/no-go: a Confirmed Critical is not a style opinion, and averaging it against anything else is how auth bypasses ship. The separation exists to stop masking, not to make a Critical finding a peer of a naming smell.
