@@ -35,7 +35,7 @@ The Spec axis needs a spec to exist and be findable. It looks in this order:
 
 Step 1 depends on the tracker doc, which [setup-matt-pocock-skills](https://aihero.dev/skills-setup-matt-pocock-skills) writes. Without it the axis still works if you hand it a path. With no spec at all, the skill skips the Spec sub-agent and the report says "no spec available" rather than inventing requirements.
 
-The Security axis needs nothing from you. It reads `SECURITY.md`, next to the skill, which carries the three trust-boundary crossings, the evidence tiers, the failed-controls register and a dated source list. It needs the network only to fetch a source it is about to cite: if a fetch fails, the finding downgrades to Unverified rather than disappearing.
+The Security axis needs nothing from you. It reads `SECURITY.md`, next to the skill, which carries the three trust-boundary crossings, the evidence tiers, the failed-controls register and a dated source list. It also detects the ecosystem from the changed paths and manifests, then reads the matching pack under `packs/` (PHP, C#/.NET, Java, JavaScript/TypeScript), so you never declare a stack. It needs the network only to fetch a source it is about to cite: if a fetch fails, the finding downgrades to Unverified rather than disappearing.
 
 ## The three axes
 
@@ -95,6 +95,7 @@ No. It diffs `<fixed-point>...HEAD`. The three-dot form measures from the merge-
 - The report arrives as three separate blocks under `## Standards`, `## Spec` and `## Security`, not one merged list.
 - Every Standards finding names either a rule in one of your repo's files or one of the twelve smells, with the hunk quoted; every Spec finding quotes a line of the spec.
 - Every Security finding names a tier, and every Supported one names a source with its status. Nothing marked Unverified names a specific API.
+- The Security block names the packs it loaded by detecting the diff, or says the diff matched none.
 - The Security block ends with a go/no-go, and any Confirmed Critical or High finding says "do not merge".
 - The closing summary gives a worst issue per axis, the security go/no-go, and declines to pick an overall winner.
 - With no spec available, the Spec block says so instead of listing requirements it inferred from the code.
