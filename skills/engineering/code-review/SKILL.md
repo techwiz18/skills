@@ -75,7 +75,7 @@ Issue all three sub-agent calls together, in the foreground, and aggregate the r
 **Security sub-agent prompt** should include:
 
 - The diff command and commit list.
-- The absolute path of `SECURITY.md` (next to this file), with the instruction to read it in full before starting. It carries the lens, the evidence tiers, the failed-controls register, the source list and the pack-detection table.
+- The absolute path of `SECURITY.md` (next to this file), with the instruction to read it in full before starting. It carries the lens, the evidence tiers, the failed-controls register, the source list and the pack-detection table. If sub-agents in your harness cannot read files, paste the contents of `SECURITY.md` and of the matching packs into the prompt instead.
 - The brief: "Detect the ecosystems from the changed paths and manifests, and read every matching pack under `packs/`. Trace each untrusted input in the diff to its sink; quote `file:line` for every hop. Report findings under the severities in `SECURITY.md`, each with its evidence tier (Confirmed / Supported / Unverified) and its support. Fetch any source you cite in this session, or downgrade the finding to Unverified. Name the packs you loaded. State the trust-boundary assumptions you inferred, and the out-of-scope line. Under 400 words."
 
 If the spec is missing, skip the Spec sub-agent and note this in the final report.
