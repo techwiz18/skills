@@ -7,3 +7,5 @@
 Findings carry an evidence tier (Confirmed, Supported, Unverified) and a severity. The reviewer must fetch any source it cites during the session, and must match docs to the version in the project's manifest, so a recommendation cannot rest on a fix that only worked against an older major. `SECURITY.md` carries the lens, the tiers, and a cited register of mechanisms that once looked like fixes and are known to fail.
 
 Security is the one documented exception to the skill's no-ranking rule: a Confirmed Critical or High finding ends that block with a go/no-go.
+
+Four language packs ship with the axis: PHP, C#/.NET, Java, and JavaScript/TypeScript. The sub-agent detects the ecosystem from the changed paths and manifests rather than asking, reads every matching pack, and names the packs it loaded. A diff in a language with no pack falls back to the base lens and marks language-specific claims Unverified.

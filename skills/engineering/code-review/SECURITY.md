@@ -91,6 +91,22 @@ Verified 2026-11-23. Re-verify before relying on any of them; update the date wh
 
 ## Language packs
 
-The lens above is language-agnostic. Add `packs/<language>.md` only when a review hits something the base lens missed; the pack may add sinks and idioms, and may not weaken the tiers. Load a pack only when the diff touches that language.
+The lens above is language-agnostic; the packs add the sinks each ecosystem actually has. Detect them from the diff, don't ask:
+
+1. `git diff --name-only <fixed>...HEAD`.
+2. Match the changed paths and manifests against this table:
+
+| Match | Pack |
+|---|---|
+| `*.php`, `*.blade.php`, Twig templates, `composer.json` | `packs/php.md` |
+| `*.cs`, `*.cshtml`, `*.razor`, `*.csproj`, `*.sln`, `web.config` | `packs/csharp.md` |
+| `*.java`, `*.kt`, `*.jsp`, `pom.xml`, `build.gradle*` | `packs/java.md` |
+| `*.js`, `*.jsx`, `*.ts`, `*.tsx`, `*.mjs`, `*.cjs`, `package.json` | `packs/javascript.md` |
+
+3. Read every matching pack in full, and name the packs you loaded in the report. Two or three at once is normal; a diff that matches none is fine and gets the base lens alone.
+4. If the ecosystem has no pack, apply the base lens and mark any language-specific claim Unverified.
+5. A pack may add sinks and idioms. It may not weaken the tiers or the fetch rule.
+
+Adding a pack: same headings, one row per sink, citations with the CWE status, and a `Verified` date. Add one when a review hits something the base lens missed, not pre-emptively.
 
 Last verified: 2026-11-23.
