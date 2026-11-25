@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ ! -d node_modules ]; then
+  echo "pre-push: dependencies missing; run 'npm ci' first." >&2
+  exit 1
+fi
+
+npm run -s check

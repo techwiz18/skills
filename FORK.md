@@ -5,6 +5,16 @@ Personal fork of `mattpocock/skills`. Two branches, one rule each:
 - `main` mirrors upstream. Never commit to it.
 - `local` holds every local change. It is the default branch, and the skill symlinks in `~/.agents/skills` serve it.
 
+## Checks
+
+`.githooks/pre-push` runs `npm run check` (frontmatter and plugin version) before
+any push. In a fresh clone:
+
+```
+npm ci
+git config core.hooksPath .githooks
+```
+
 ## Taking upstream updates
 
 ```
