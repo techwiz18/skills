@@ -23,7 +23,7 @@ Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so th
 
 Before going further, confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty. A bad ref or empty diff should fail here, not inside two parallel sub-agents.
 
-### 2. Identify the spec source
+### 2. Identify the spec source and its scope
 
 Look for the originating spec, in this order:
 
@@ -31,6 +31,8 @@ Look for the originating spec, in this order:
 2. A path the user passed as an argument.
 3. A spec file under `docs/`, `specs/`, or `.scratch/` matching the branch name or feature.
 4. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent will skip and report "no spec available".
+
+Once the spec is found, capture its **scope**: the ticket's own out-of-scope notes and the titles of its follow-up tickets. Every axis gets this scope.
 
 ### 3. Identify the standards sources
 
@@ -59,6 +61,8 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 ### 4. Spawn all three sub-agents in parallel
 
 Issue all three sub-agent calls together, in the foreground, and aggregate the reports they return.
+
+Every prompt also carries the **scope** from step 2: the ticket's out-of-scope notes and its follow-up tickets. Work that belongs to a follow-up ticket is out of scope for this review, on every axis.
 
 **Standards sub-agent prompt** should include:
 

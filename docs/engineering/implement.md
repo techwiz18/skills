@@ -32,9 +32,9 @@ If the tickets came from [to-tickets](https://aihero.dev/skills-to-tickets), [se
 
 A run has five steps, in order:
 
-1. Read the ticket or spec and work out the seams.
-2. Drive [tdd](https://aihero.dev/skills-tdd) at the pre-agreed seams, one red-green slice at a time.
-3. Typecheck often, run single test files as it goes.
+1. Read the ticket or spec, state the ticket's title, and choose one seam.
+2. Turn each acceptance criterion into a failing test at that seam, then drive [tdd](https://aihero.dev/skills-tdd) one red-green slice at a time.
+3. Run the repo's check command often, and single test files as it goes.
 4. Run the full test suite once, at the end.
 5. Run [code-review](https://aihero.dev/skills-code-review), then commit to the current branch.
 
@@ -44,7 +44,7 @@ One run covers one ticket. The tickets [to-tickets](https://aihero.dev/skills-to
 
 The skill's central idea is the **seam**, the public boundary you observe behaviour at without reaching inside. Tests live at seams. When the seam is agreed before any code exists, the tests last, and you can rewrite the implementation underneath without changing them.
 
-The "pre-agreed" part matters, and it is also the skill's weakest point. Nothing inside `implement` agrees the seams. `tdd` is the skill that asks, and it refuses to write a test at an unconfirmed seam. So in practice the agreement happens either upstream in the spec, or in the first exchange of the run. If it happens nowhere, the run becomes "just write the code" and nothing warns you. Naming the seams in the spec is what stops that.
+The "pre-agreed" part matters, and it is also the skill's weakest point. `tdd` refuses to write a test at an unconfirmed seam, so the agreement normally happens upstream in the spec or in the first exchange of the run. When neither supplies one, `implement` now names a seam itself and turns each acceptance criterion into a failing test there before editing. Naming the seams in the spec is still better: the agreement then happens before any code exists.
 
 ## Common questions
 
